@@ -83,6 +83,6 @@ fabric.properties
 
 # Sonarlint plugin
 .idea/sonarlint
-pc_builder/bin
+bin/
 # End of https://www.gitignore.io/api/intellij
 
