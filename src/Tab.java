@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.awt.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.BoxLayout;
 
 public abstract class Tab {
     JPanel upPanel = new JPanel();
@@ -18,6 +17,7 @@ public abstract class Tab {
 
     JButton addBtn = new JButton("Add");
     JButton delBtn = new JButton("Delete");
+    JButton searchBtn = new JButton("Search");
 
     JLabel searchLabel = new JLabel("Search:");
     JTextField searchTField = new JTextField();
@@ -30,9 +30,10 @@ public abstract class Tab {
         //midPanel
         midPanel.add(addBtn);
         midPanel.add(delBtn);
-        searchPanel.setLayout(new GridLayout(5, 2));
+        searchPanel.setLayout(new GridLayout(2, 2));
         searchPanel.add(searchLabel);
         searchPanel.add(searchTField);
+        searchPanel.add(searchBtn);
         downPanel.add(scroller);
         scroller.setPreferredSize(new Dimension(450, 100));
     }

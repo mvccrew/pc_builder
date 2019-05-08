@@ -15,23 +15,38 @@ public class PcBuilder extends JFrame{
 	PreparedStatement state = null;
 	int id = -1;
 
+	JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+
 	PartsTab parts = new PartsTab();
+	ComputersTab computers = new ComputersTab();
 
 	public PcBuilder() {
 		this.setVisible(true);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		this.setSize(600, 600);
-		this.setLayout(new GridLayout(4, 1));
+		this.setSize(1000, 1000);
 
-		for (JPanel panel : parts.getPanels()) {
-			this.add(panel);
-		}
+		tabbedPane.add("Parts", getTabContent(parts));
+		tabbedPane.add("Computers", getTabContent(computers));
+		this.add(tabbedPane);
 
 		parts.addBtn.addActionListener(new AddAction());
 		parts.delBtn.addActionListener(new DeleteAction());
 		parts.table.addMouseListener(new MouseTableAction());
+		parts.searchBtn.addActionListener(new SearchAction());
 
 	}//end constructor
+
+	private static JPanel getTabContent(Tab tab) {
+		JPanel containerPanel = new JPanel();
+		containerPanel.setLayout(new GridLayout(4, 1));
+		containerPanel.setPreferredSize(new Dimension(1000, 1000));
+
+		for (JPanel panel : tab.getPanels()) {
+			containerPanel.add(panel);
+		}
+
+		return containerPanel;
+	}
 
 	class SearchAction implements ActionListener {
 

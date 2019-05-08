@@ -48,7 +48,9 @@ public class DBHelper {
 		conn = getConnection();
 		try {
 			PreparedStatement state = conn.prepareStatement(sql);
-			if (!name.equalsIgnoreCase(""))
+			if (!name.equalsIgnoreCase("")) {
+				state.setString(1, name);
+			}
 			result = state.executeQuery();
 			model = new MyModel(result);
 		} catch (SQLException e) {
