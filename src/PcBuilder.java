@@ -65,8 +65,9 @@ public class PcBuilder extends JFrame{
 			int row = parts.table.getSelectedRow();
 			id = Integer.parseInt(parts.table.getValueAt(row, 0).toString());
 			if(e.getClickCount() > 1) {
+				String type = parts.table.getValueAt(row, 3).toString();
 				parts.nameTField.setText(parts.table.getValueAt(row, 1).toString());
-				String type = parts.table.getValueAt(row, 5).toString();
+				parts.priceTField.setText(parts.table.getValueAt(row, 2).toString());
 				parts.typeCombo.setSelectedItem(type);
 			}
 		}
@@ -131,17 +132,24 @@ public class PcBuilder extends JFrame{
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			String name = parts.nameTField.getText();
-			int price = Integer.parseInt(parts.priceTField.getText());
+			double price = Double.parseDouble(parts.priceTField.getText());
 			String type = parts.typeCombo.getSelectedItem().toString();
-			String sql = "insert into parts values (null,?,?,?);";
+			String sql;
+			if (DBHelper.getAllModel("parts where id=" + id) != null) {
+				sql = "update parts set name=?, price=?, type=? where id=" + id;
+			}
+			else {
+				sql = "insert into parts values (null,?,?,?);";
+			}
 			
 			conn = DBHelper.getConnection();
 			try {
 				state = conn.prepareStatement(sql);
 				state.setString(1, name);
-				state.setInt(2, price);
+				state.setDouble(2, price);
 				state.setString(3, type);
 				state.execute();
+				id = -1;
 				parts.table.setModel(DBHelper.getAllModel("parts"));
 			} catch (SQLException e1) {
 				// TODO Auto-generated catch block

@@ -35,6 +35,7 @@ public class ComputersTab extends Tab {
         hddCombo = new JComboBox<>(getParts("RAM").toArray(new String[0]));
         coolingCombo = new JComboBox<>(getParts("Cooling").toArray(new String[0]));
 
+        priceTField.setEditable(false);
         upPanel.setLayout(new GridLayout(8, 2));
         upPanel.add(nameLabel);
         upPanel.add(nameTField);
@@ -50,6 +51,8 @@ public class ComputersTab extends Tab {
         upPanel.add(coolingCombo);
         upPanel.add(typeLabel);
         upPanel.add(typeCombo);
+        upPanel.add(priceLabel);
+        upPanel.add(priceTField);
         table.setModel(DBHelper.getAllModel("parts"));
     }
 
