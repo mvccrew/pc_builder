@@ -34,6 +34,8 @@ public class PcBuilder extends JFrame{
 		parts.table.addMouseListener(new MouseTableAction());
 		parts.searchBtn.addActionListener(new SearchAction());
 
+		computers.addBtn.addActionListener(new AddCompAction());
+
 	}//end constructor
 
 	private static JPanel getTabContent(Tab tab) {
@@ -135,7 +137,7 @@ public class PcBuilder extends JFrame{
 			double price = Double.parseDouble(parts.priceTField.getText());
 			String type = parts.typeCombo.getSelectedItem().toString();
 			String sql;
-			if (DBHelper.getAllModel("parts where id=" + id) != null) {
+			if (DBHelper.getFilteredByName(name, "parts").getRowCount() != 0) {
 				sql = "update parts set name=?, price=?, type=? where id=" + id;
 			}
 			else {
@@ -151,6 +153,7 @@ public class PcBuilder extends JFrame{
 				state.execute();
 				id = -1;
 				parts.table.setModel(DBHelper.getAllModel("parts"));
+				computers.table.setModel(DBHelper.getAllModel("computers"));
 			} catch (SQLException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -168,6 +171,54 @@ public class PcBuilder extends JFrame{
 			
 		}
 		
+	}
+	class AddCompAction implements ActionListener{
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			String name = computers.nameTField.getText();
+			String cpu = computers.cpuCombo.getSelectedItem().toString();
+			String gpu = computers.gpuCombo.getSelectedItem().toString();
+			String ram = computers.ramCombo.getSelectedItem().toString();
+			String hdd = computers.hddCombo.getSelectedItem().toString();
+			String cooling = computers.coolingCombo.getSelectedItem().toString();
+			String type = computers.typeCombo.getSelectedItem().toString();
+			Double price = 50.5;
+			/*double price = getPartPrice(computers.cpuCombo.getSelectedItem().toString()) +
+					getPartPrice(computers.gpuCombo.getSelectedItem().toString()) + getPartPrice(computers.ramCombo.getSelectedItem().toString()) +
+					getPartPrice(computers.hddCombo.getSelectedItem().toString()) + getPartPrice(computers.coolingCombo.getSelectedItem().toString());*/
+			String sql = "insert into computers values (null,?,?,?,?,?,?,?,?);";
+
+			conn = DBHelper.getConnection();
+			try {
+				state = conn.prepareStatement(sql);
+				state.setString(1, name);
+				state.setDouble(2, price);
+				state.setString(3, type);
+				state.setString(4, cpu);
+				state.setString(5, gpu);
+				state.setString(6, ram);
+				state.setString(7, hdd);
+				state.setString(8, cooling);
+				state.execute();
+				computers.table.setModel(DBHelper.getAllModel("computers"));
+			} catch (SQLException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}finally {
+				try {
+					state.close();
+					conn.close();
+				} catch (SQLException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+
+			computers.clearForm();
+
+		}
+
 	}
 
 }//end class PcBuilder
