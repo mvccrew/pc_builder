@@ -11,7 +11,7 @@ public class MyModel extends AbstractTableModel {
 	private ResultSet result;	
 	private int rowCount;	
 	private int columnCount;
-	private ArrayList<Object> data=new ArrayList<Object>();
+	private ArrayList<Object> data=new ArrayList<>();
 	 
 	 public MyModel(ResultSet rs) throws Exception
 	 {

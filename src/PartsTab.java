@@ -1,6 +1,10 @@
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class PartsTab extends Tab {
     JLabel nameLabel = new JLabel("Name:");
@@ -20,6 +24,39 @@ public class PartsTab extends Tab {
         upPanel.add(typeLabel);
         upPanel.add(typeCombo);
         table.setModel(DBHelper.getAllModel("parts"));
+    }
+
+    public int getPartId(String name, String type) {
+        int id = -1;
+        String sql = "select id from parts where name=? and type=?";
+        PreparedStatement state = null;
+        Connection conn = DBHelper.getConnection();
+        try {
+            state = conn.prepareStatement(sql);
+            state.setString(1, name);
+            state.setString(2, type);
+            ResultSet result = state.executeQuery();
+
+            while (result.next()) {
+                id = result.getInt("id");
+            }
+
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }finally {
+            try {
+                state.close();
+                conn.close();
+            } catch (SQLException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
+        }
+        return id;
     }
 
     public void clearForm() {

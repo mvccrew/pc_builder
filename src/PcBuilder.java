@@ -6,6 +6,7 @@ import java.awt.event.MouseListener;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import javax.swing.*;
 
@@ -153,7 +154,8 @@ public class PcBuilder extends JFrame{
 				state.execute();
 				id = -1;
 				parts.table.setModel(DBHelper.getAllModel("parts"));
-				computers.table.setModel(DBHelper.getAllModel("computers"));
+				computers.upPanel.revalidate();
+				computers.upPanel.repaint();
 			} catch (SQLException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -177,13 +179,13 @@ public class PcBuilder extends JFrame{
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			String name = computers.nameTField.getText();
-			String cpu = computers.cpuCombo.getSelectedItem().toString();
-			String gpu = computers.gpuCombo.getSelectedItem().toString();
-			String ram = computers.ramCombo.getSelectedItem().toString();
-			String hdd = computers.hddCombo.getSelectedItem().toString();
-			String cooling = computers.coolingCombo.getSelectedItem().toString();
+			int cpuId = parts.getPartId(computers.cpuCombo.getSelectedItem().toString(), "CPU");
+			int gpuId = parts.getPartId(computers.gpuCombo.getSelectedItem().toString(), "GPU");
+			int ramId = parts.getPartId(computers.ramCombo.getSelectedItem().toString(), "RAM");
+			int hddId = parts.getPartId(computers.hddCombo.getSelectedItem().toString(), "HDD");
+			int coolingId = parts.getPartId(computers.coolingCombo.getSelectedItem().toString(), "Cooling");
 			String type = computers.typeCombo.getSelectedItem().toString();
-			Double price = 50.5;
+			double price = computers.getTotalPrice(cpuId, gpuId, ramId, hddId, coolingId);
 			/*double price = getPartPrice(computers.cpuCombo.getSelectedItem().toString()) +
 					getPartPrice(computers.gpuCombo.getSelectedItem().toString()) + getPartPrice(computers.ramCombo.getSelectedItem().toString()) +
 					getPartPrice(computers.hddCombo.getSelectedItem().toString()) + getPartPrice(computers.coolingCombo.getSelectedItem().toString());*/
@@ -195,11 +197,11 @@ public class PcBuilder extends JFrame{
 				state.setString(1, name);
 				state.setDouble(2, price);
 				state.setString(3, type);
-				state.setString(4, cpu);
-				state.setString(5, gpu);
-				state.setString(6, ram);
-				state.setString(7, hdd);
-				state.setString(8, cooling);
+				state.setInt(4, cpuId);
+				state.setInt(5, gpuId);
+				state.setInt(6, ramId);
+				state.setInt(7, hddId);
+				state.setInt(8, coolingId);
 				state.execute();
 				computers.table.setModel(DBHelper.getAllModel("computers"));
 			} catch (SQLException e1) {

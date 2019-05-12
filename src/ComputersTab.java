@@ -7,7 +7,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.awt.*;
-import java.util.HashMap;
 
 public class ComputersTab extends Tab {
     JLabel nameLabel = new JLabel("Name:");
@@ -29,18 +28,12 @@ public class ComputersTab extends Tab {
     JComboBox<String> hddCombo;
     JComboBox<String> coolingCombo;
 
-    HashMap<Integer, String> cpuParts = getParts("CPU");
-    HashMap<Integer, String> gpuParts = getParts("GPU");
-    HashMap<Integer, String> ramParts = getParts("RAM");
-    HashMap<Integer, String> hddParts = getParts("HDD");
-    HashMap<Integer, String> coolingParts = getParts("Cooling");
-
     public ComputersTab() {
-        cpuCombo = new JComboBox<>(cpuParts.values().toArray(new String[0]));
-        gpuCombo = new JComboBox<>(gpuParts.values().toArray(new String[0]));
-        ramCombo = new JComboBox<>(ramParts.values().toArray(new String[0]));
-        hddCombo = new JComboBox<>(hddParts.values().toArray(new String[0]));
-        coolingCombo = new JComboBox<>(coolingParts.values().toArray(new String[0]));
+        cpuCombo = new JComboBox<>(getParts("CPU").toArray(new String[0]));
+        gpuCombo = new JComboBox<>(getParts("GPU").toArray(new String[0]));
+        ramCombo = new JComboBox<>(getParts("RAM").toArray(new String[0]));
+        hddCombo = new JComboBox<>(getParts("HDD").toArray(new String[0]));
+        coolingCombo = new JComboBox<>(getParts("Cooling").toArray(new String[0]));
 
         priceTField.setEditable(false);
         upPanel.setLayout(new GridLayout(8, 2));
@@ -61,12 +54,13 @@ public class ComputersTab extends Tab {
         upPanel.add(priceLabel);
         upPanel.add(priceTField);
         table.setModel(DBHelper.getAllModel("computers"));
+        scroller.setPreferredSize(new Dimension(850, 100));
     }
 
-    private HashMap<Integer, String> getParts(String part) {
+    private ArrayList<String> getParts(String part) {
 
-        HashMap<Integer, String> parts = new HashMap<>();
-        String sql = "select id, name from parts where type = ?";
+        ArrayList<String> parts = new ArrayList<>();
+        String sql = "select name from parts where type = ?";
         PreparedStatement state = null;
         Connection conn = DBHelper.getConnection();
 
@@ -76,9 +70,8 @@ public class ComputersTab extends Tab {
             ResultSet result = state.executeQuery();
 
             while (result.next()) {
-                Integer id = result.getInt("id");
                 String partName = result.getString("name");
-                parts.put(id, partName);
+                parts.add(partName);
             }
 
         } catch (SQLException e) {
@@ -97,6 +90,44 @@ public class ComputersTab extends Tab {
             }
         }
         return parts;
+    }
+
+    public double getTotalPrice(int... partIds) {
+        double price = 0;
+        String sql = "select price from parts where id in (?, ?, ?, ?, ?)";
+        PreparedStatement state = null;
+        Connection conn = DBHelper.getConnection();
+
+        try {
+            state = conn.prepareStatement(sql);
+            int index = 1;
+            for (int id : partIds) {
+                state.setInt(index, id);
+                index++;
+            }
+            ResultSet result = state.executeQuery();
+
+            while (result.next()) {
+                double itemPrice = result.getDouble("price");
+                price += itemPrice;
+            }
+
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }finally {
+            try {
+                state.close();
+                conn.close();
+            } catch (SQLException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
+        }
+        return price;
     }
 
     public void clearForm() {
