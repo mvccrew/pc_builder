@@ -211,6 +211,12 @@ public class PcBuilder extends JFrame{
 				state.execute();
 				id = -1;
 				parts.table.setModel(DBHelper.getAllModel("parts"));
+				computers.table.setModel(DBHelper.getCompModel());
+				computers.table.getColumnModel().getColumn(4).setHeaderValue("CPU");
+				computers.table.getColumnModel().getColumn(5).setHeaderValue("GPU");
+				computers.table.getColumnModel().getColumn(6).setHeaderValue("RAM");
+				computers.table.getColumnModel().getColumn(7).setHeaderValue("HDD");
+				computers.table.getColumnModel().getColumn(8).setHeaderValue("COOLING");
 			} catch (SQLException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();

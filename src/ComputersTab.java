@@ -131,7 +131,7 @@ public class ComputersTab extends Tab {
 
     public double getTotalPrice(int... partIds) {
         double price = 0;
-        String sql = "select price from parts where id in (?, ?, ?, ?, ?)";
+        String sql = "select sum(price) from parts where id in (?, ?, ?, ?, ?)";
         PreparedStatement state = null;
         Connection conn = DBHelper.getConnection();
 
@@ -144,10 +144,7 @@ public class ComputersTab extends Tab {
             }
             ResultSet result = state.executeQuery();
 
-            while (result.next()) {
-                double itemPrice = result.getDouble("price");
-                price += itemPrice;
-            }
+            price = result.getDouble("sum(price)");
 
         } catch (SQLException e) {
             // TODO Auto-generated catch block
