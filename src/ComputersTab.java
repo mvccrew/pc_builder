@@ -53,10 +53,47 @@ public class ComputersTab extends Tab {
         upPanel.add(typeCombo);
         upPanel.add(priceLabel);
         upPanel.add(priceTField);
-        table.setModel(DBHelper.getAllModel("computers"));
+        table.setModel(DBHelper.getCompModel());
+        table.getColumnModel().getColumn(4).setHeaderValue("CPU");
+        table.getColumnModel().getColumn(5).setHeaderValue("GPU");
+        table.getColumnModel().getColumn(6).setHeaderValue("RAM");
+        table.getColumnModel().getColumn(7).setHeaderValue("HDD");
+        table.getColumnModel().getColumn(8).setHeaderValue("COOLING");
         scroller.setPreferredSize(new Dimension(850, 100));
     }
 
+    public int getCompId(String name) {
+    	int id = -1;
+        String sql = "select id from computers where name=?";
+        PreparedStatement state = null;
+        Connection conn = DBHelper.getConnection();
+        try {
+            state = conn.prepareStatement(sql);
+            state.setString(1, name);
+            ResultSet result = state.executeQuery();
+
+            while (result.next()) {
+                id = result.getInt("id");
+            }
+
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }finally {
+            try {
+                state.close();
+                conn.close();
+            } catch (SQLException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
+        }
+        return id;
+    }
+    
     private ArrayList<String> getParts(String part) {
 
         ArrayList<String> parts = new ArrayList<>();
