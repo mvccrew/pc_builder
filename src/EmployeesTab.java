@@ -11,13 +11,11 @@ import javax.swing.JLabel;
 import javax.swing.JTextField;
 
 public class EmployeesTab extends Tab {
-	JLabel firstNameLabel = new JLabel("First name: ");
-	JLabel lastNameLabel = new JLabel("Last name: ");
+	JLabel nameLabel = new JLabel("Name: ");
 	JLabel departmentLabel = new JLabel("Department: ");
 	JLabel computerLabel = new JLabel("PC: ");
 	
-    JTextField firstNameTField = new JTextField();
-    JTextField lastNameTField = new JTextField();
+    JTextField nameTField = new JTextField();
     String[] departmentContent = {"","dep 1","dep 2","dep 3"};
     JComboBox<String> departmentCombo = new JComboBox<>(departmentContent);
     
@@ -27,17 +25,17 @@ public class EmployeesTab extends Tab {
 	public EmployeesTab() {
 		computersCombo = new JComboBox<>(getComputers().toArray(new String[0]));
 		
-		upPanel.setLayout(new GridLayout(8, 2));
-        upPanel.add(firstNameLabel);
-        upPanel.add(firstNameTField);
-        upPanel.add(lastNameLabel);
-        upPanel.add(lastNameTField);
+		upPanel.setLayout(new GridLayout(4, 2));
+        upPanel.add(nameLabel);
+        upPanel.add(nameTField);
         upPanel.add(departmentLabel);
         upPanel.add(departmentCombo);
         upPanel.add(computerLabel);
         upPanel.add(computersCombo);
         
-        table.setModel(DBHelper.getAllModel("employees"));
+        table.setModel(DBHelper.getEmpModel());
+        table.getColumnModel().getColumn(3).setHeaderValue("COMPUTER");
+        this.hideIdColumn();
         scroller.setPreferredSize(new Dimension(850, 100));
 	}
 	
@@ -76,8 +74,7 @@ public class EmployeesTab extends Tab {
 
 	@Override
 	void clearForm() {
-		firstNameTField.setText("");
-		lastNameTField.setText("");
+		nameTField.setText("");
 		departmentCombo.setSelectedIndex(0);
 		computersCombo.setSelectedIndex(0);
 	}

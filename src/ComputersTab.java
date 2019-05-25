@@ -59,6 +59,7 @@ public class ComputersTab extends Tab {
         table.getColumnModel().getColumn(6).setHeaderValue("RAM");
         table.getColumnModel().getColumn(7).setHeaderValue("HDD");
         table.getColumnModel().getColumn(8).setHeaderValue("COOLING");
+        this.hideIdColumn();
         scroller.setPreferredSize(new Dimension(850, 100));
     }
 
@@ -131,7 +132,7 @@ public class ComputersTab extends Tab {
 
     public double getTotalPrice(int... partIds) {
         double price = 0;
-        String sql = "select sum(price) from parts where id in (?, ?, ?, ?, ?)";
+        String sql = "select price from parts where id in (?, ?, ?, ?, ?)";
         PreparedStatement state = null;
         Connection conn = DBHelper.getConnection();
 
@@ -144,7 +145,10 @@ public class ComputersTab extends Tab {
             }
             ResultSet result = state.executeQuery();
 
-            price = result.getDouble("sum(price)");
+            while (result.next()) {
+                double itemPrice = result.getDouble("price");
+                price += itemPrice;
+            }
 
         } catch (SQLException e) {
             // TODO Auto-generated catch block

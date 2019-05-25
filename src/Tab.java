@@ -16,6 +16,7 @@ public abstract class Tab {
     JPanel downPanel = new JPanel();
 
     JButton addBtn = new JButton("Add");
+    JButton updateBtn = new JButton("Update");
     JButton delBtn = new JButton("Delete");
     JButton searchBtn = new JButton("Search");
 
@@ -29,6 +30,7 @@ public abstract class Tab {
         upPanel.setBorder(new EmptyBorder(50, 50, 0, 50));
         //midPanel
         midPanel.add(addBtn);
+        midPanel.add(updateBtn);
         midPanel.add(delBtn);
         searchPanel.setLayout(new GridLayout(2, 2));
         searchPanel.add(searchLabel);
@@ -36,6 +38,13 @@ public abstract class Tab {
         searchPanel.add(searchBtn);
         downPanel.add(scroller);
         scroller.setPreferredSize(new Dimension(450, 100));
+
+    }
+
+    protected void hideIdColumn() {
+        table.getColumnModel().getColumn(0).setMinWidth(0);
+        table.getColumnModel().getColumn(0).setMaxWidth(0);
+        table.getColumnModel().getColumn(0).setWidth(0);
     }
 
     public ArrayList<JPanel> getPanels() {

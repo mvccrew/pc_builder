@@ -24,6 +24,7 @@ public class PartsTab extends Tab {
         upPanel.add(typeLabel);
         upPanel.add(typeCombo);
         table.setModel(DBHelper.getAllModel("parts"));
+        this.hideIdColumn();
     }
 
     public int getPartId(String name, String type) {
