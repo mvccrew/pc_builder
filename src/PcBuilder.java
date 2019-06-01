@@ -6,7 +6,6 @@ import java.awt.event.MouseListener;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.HashMap;
 
 import javax.swing.*;
 
@@ -21,7 +20,8 @@ public class PcBuilder extends JFrame{
 	PartsTab parts = new PartsTab();
 	ComputersTab computers = new ComputersTab();
 	EmployeesTab employees = new EmployeesTab();
-	SearchByDepAndPrice searchTab = new SearchByDepAndPrice();
+	SearchByDepAndPrice searchByDep = new SearchByDepAndPrice();
+	SearchByType searchByType = new SearchByType();
 
 	public PcBuilder() {
 		this.setVisible(true);
@@ -31,11 +31,8 @@ public class PcBuilder extends JFrame{
 		tabbedPane.add("Parts", getTabContent(parts));
 		tabbedPane.add("Computers", getTabContent(computers));
 		tabbedPane.add("Employees", getTabContent(employees));
-		JPanel searchPanel = new JPanel();
-		for (JPanel panel : searchTab.getPanels()) {
-			searchPanel.add(panel);
-		}
-		tabbedPane.add("Search by dep and price", searchPanel);
+		tabbedPane.add("Search by dept and price", getTabContent(searchByDep));
+		tabbedPane.add("Search by type", getTabContent(searchByType));
 		this.add(tabbedPane);
 
 		parts.addBtn.addActionListener(new AddAction());
@@ -56,10 +53,11 @@ public class PcBuilder extends JFrame{
 		employees.delBtn.addActionListener(new DeleteEmpAction());
 		employees.searchBtn.addActionListener(new SearchAction("employees", employees));
 
-		searchTab.searchBtn.addActionListener(new SearchByDepAndPriceAction());
+		searchByDep.searchBtn.addActionListener(new SearchByDepAndPriceAction());
+		searchByType.searchBtn.addActionListener(new SearchByTypeAction());
 	}//end constructor
 
-	private JPanel getTabContent(Tab tab) {
+	private JPanel getTabContent(Panelled tab) {
 		JPanel containerPanel = new JPanel();
 		containerPanel.setLayout(new GridLayout(4, 1));
 		containerPanel.setPreferredSize(new Dimension(1000, 1000));
@@ -91,10 +89,20 @@ public class PcBuilder extends JFrame{
 	class SearchByDepAndPriceAction implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			String dep = searchTab.depComboBox.getSelectedItem().toString();
-			double price = Double.parseDouble(searchTab.priceTextField.getText());
-			searchTab.table.setModel(DBHelper.getByDepAndSearchModel(dep, price));
-			searchTab.clearForm();
+			String dep = searchByDep.depComboBox.getSelectedItem().toString();
+			double price = Double.parseDouble(searchByDep.priceTextField.getText());
+			searchByDep.table.setModel(DBHelper.searchByDepModel(dep, price));
+			searchByDep.clearForm();
+		}
+	}
+
+	class SearchByTypeAction implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			String partType = searchByType.partComboBox.getSelectedItem().toString();
+			String compType = searchByType.compComboBox.getSelectedItem().toString();
+			searchByType.updateTable(partType, compType);
+			searchByType.clearForm();
 		}
 	}
 	

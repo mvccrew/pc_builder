@@ -16,7 +16,7 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
-public class SearchByDepAndPrice {
+public class SearchByDepAndPrice implements Panelled {
 
 	JPanel upPanel = new JPanel();
 	JPanel midPanel = new JPanel();
@@ -27,14 +27,14 @@ public class SearchByDepAndPrice {
 	JLabel depLabel = new JLabel("Department");
     String[] departmentContent = {"","Production","Marketing","HR Management", "Accounting and Finance", "Research and Development"};
 	JComboBox<String> depComboBox = new JComboBox<>(departmentContent);
-	JLabel priceLabel = new JLabel("Price > ");
+	JLabel priceLabel = new JLabel("Price");
 	JTextField priceTextField = new JTextField();
 	
 	JTable table = new JTable();
 	JScrollPane scroller = new JScrollPane(table);
 	
 	public SearchByDepAndPrice() {
-		upPanel.setLayout(new GridLayout(2, 2));
+		upPanel.setLayout(new GridLayout(4, 2));
         upPanel.setBorder(new EmptyBorder(50, 50, 0, 50));
         upPanel.add(depLabel);
         upPanel.add(depComboBox);

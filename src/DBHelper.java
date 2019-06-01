@@ -85,11 +85,32 @@ public class DBHelper {
 		return model;
 	}//end method
 	
-	public static MyModel getByDepAndSearchModel(String dep, double price) {
-		String sql = "SELECT E.NAME\n" + 
+	public static MyModel searchByDepModel(String dep, double price) {
+		String sql = "SELECT E.NAME, C.PRICE\n" +
 				"FROM EMPLOYEES E JOIN COMPUTERS C\n" + 
 				"ON E.COMPUTER_ID = C.ID\n" + 
 				"WHERE E.DEPARTMENT = '"+ dep + "' AND C.PRICE > " + price + ";";
+		conn = getConnection();
+		try {
+			PreparedStatement state = conn.prepareStatement(sql);
+			result = state.executeQuery();
+			model = new MyModel(result);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return model;
+	}//end method
+
+	public static MyModel searchByTypeModel(String partType, String compType) {
+		String sql = "SELECT P.NAME, C.NAME\n" +
+				"FROM PARTS P JOIN COMPUTERS C\n" +
+				"ON P.ID = C."+partType+"ID\n" +
+				"WHERE C.TYPE = '"+ compType + "'";
 		conn = getConnection();
 		try {
 			PreparedStatement state = conn.prepareStatement(sql);

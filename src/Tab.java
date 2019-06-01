@@ -9,7 +9,7 @@ import java.util.Arrays;
 import java.awt.*;
 import javax.swing.border.EmptyBorder;
 
-public abstract class Tab {
+public abstract class Tab implements Panelled {
     JPanel upPanel = new JPanel();
     JPanel midPanel = new JPanel();
     JPanel searchPanel = new JPanel();
@@ -48,7 +48,7 @@ public abstract class Tab {
     }
 
     public ArrayList<JPanel> getPanels() {
-        return new ArrayList<>(Arrays.asList(upPanel, midPanel, searchPanel,downPanel));
+        return new ArrayList<>(Arrays.asList(upPanel, midPanel, searchPanel, downPanel));
     }
 
     abstract void updateCombos();
