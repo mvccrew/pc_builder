@@ -16,14 +16,14 @@ public class EmployeesTab extends Tab {
 	JLabel computerLabel = new JLabel("PC: ");
 	
     JTextField nameTField = new JTextField();
-    String[] departmentContent = {"","dep 1","dep 2","dep 3"};
+    String[] departmentContent = {"","Production","Marketing","HR Management", "Accounting and Finance", "Research and Development"};
     JComboBox<String> departmentCombo = new JComboBox<>(departmentContent);
     
-    JComboBox<String> computersCombo;
+    JComboBox<String> computersCombo = new JComboBox<>();
 	
 	
 	public EmployeesTab() {
-		computersCombo = new JComboBox<>(getComputers().toArray(new String[0]));
+		updateCombos();
 		
 		upPanel.setLayout(new GridLayout(4, 2));
         upPanel.add(nameLabel);
@@ -33,9 +33,7 @@ public class EmployeesTab extends Tab {
         upPanel.add(computerLabel);
         upPanel.add(computersCombo);
         
-        table.setModel(DBHelper.getEmpModel());
-        table.getColumnModel().getColumn(3).setHeaderValue("COMPUTER");
-        this.hideIdColumn();
+        updateTable();
         scroller.setPreferredSize(new Dimension(850, 100));
 	}
 	
@@ -71,6 +69,19 @@ public class EmployeesTab extends Tab {
         }
         return computers;
 	}
+
+	public void updateCombos() {
+        computersCombo.removeAllItems();
+        for (String item : getComputers()) {
+            computersCombo.addItem(item);
+        }
+    }
+
+	public void updateTable() {
+        table.setModel(DBHelper.getEmpModel());
+        table.getColumnModel().getColumn(3).setHeaderValue("COMPUTER");
+        hideIdColumn();
+    }
 
 	@Override
 	void clearForm() {

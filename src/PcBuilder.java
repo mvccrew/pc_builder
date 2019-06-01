@@ -6,6 +6,7 @@ import java.awt.event.MouseListener;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.HashMap;
 
 import javax.swing.*;
 
@@ -20,6 +21,7 @@ public class PcBuilder extends JFrame{
 	PartsTab parts = new PartsTab();
 	ComputersTab computers = new ComputersTab();
 	EmployeesTab employees = new EmployeesTab();
+	SearchByDepAndPrice searchTab = new SearchByDepAndPrice();
 
 	public PcBuilder() {
 		this.setVisible(true);
@@ -29,6 +31,11 @@ public class PcBuilder extends JFrame{
 		tabbedPane.add("Parts", getTabContent(parts));
 		tabbedPane.add("Computers", getTabContent(computers));
 		tabbedPane.add("Employees", getTabContent(employees));
+		JPanel searchPanel = new JPanel();
+		for (JPanel panel : searchTab.getPanels()) {
+			searchPanel.add(panel);
+		}
+		tabbedPane.add("Search by dep and price", searchPanel);
 		this.add(tabbedPane);
 
 		parts.addBtn.addActionListener(new AddAction());
@@ -49,9 +56,10 @@ public class PcBuilder extends JFrame{
 		employees.delBtn.addActionListener(new DeleteEmpAction());
 		employees.searchBtn.addActionListener(new SearchAction("employees", employees));
 
+		searchTab.searchBtn.addActionListener(new SearchByDepAndPriceAction());
 	}//end constructor
 
-	private static JPanel getTabContent(Tab tab) {
+	private JPanel getTabContent(Tab tab) {
 		JPanel containerPanel = new JPanel();
 		containerPanel.setLayout(new GridLayout(4, 1));
 		containerPanel.setPreferredSize(new Dimension(1000, 1000));
@@ -77,6 +85,16 @@ public class PcBuilder extends JFrame{
 			String search = tab.searchTField.getText();
 			tab.table.setModel(DBHelper.getFilteredByName(search, tableName));
 			tab.clearForm();
+		}
+	}
+	
+	class SearchByDepAndPriceAction implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			String dep = searchTab.depComboBox.getSelectedItem().toString();
+			double price = Double.parseDouble(searchTab.priceTextField.getText());
+			searchTab.table.setModel(DBHelper.getByDepAndSearchModel(dep, price));
+			searchTab.clearForm();
 		}
 	}
 	
@@ -221,17 +239,10 @@ public class PcBuilder extends JFrame{
 				state = conn.prepareStatement(sql);
 				state.setInt(1, id);
 				state.execute();
+				parts.updateTable();
+				computers.updateCombos();
+				computers.updateTable();
 				id = -1;
-				parts.table.setModel(DBHelper.getAllModel("parts"));
-				parts.hideIdColumn();
-				computers.table.setModel(DBHelper.getCompModel());
-				computers.table.getColumnModel().getColumn(4).setHeaderValue("CPU");
-				computers.table.getColumnModel().getColumn(5).setHeaderValue("GPU");
-				computers.table.getColumnModel().getColumn(6).setHeaderValue("RAM");
-				computers.table.getColumnModel().getColumn(7).setHeaderValue("HDD");
-				computers.table.getColumnModel().getColumn(8).setHeaderValue("COOLING");
-				computers.hideIdColumn();
-
 
 			} catch (SQLException e1) {
 				// TODO Auto-generated catch block
@@ -257,18 +268,15 @@ public class PcBuilder extends JFrame{
 			String sql = "delete from computers where id=?";
 			conn = DBHelper.getConnection();
 			try {
+				String compName = computers.getCompName(id);
 				state = conn.prepareStatement(sql);
 				state.setInt(1, id);
 				state.execute();
+				computers.updateTable();
+				computers.clearForm();
+				employees.updateCombos();
+				employees.updateTable();
 				id = -1;
-				computers.table.setModel(DBHelper.getCompModel());
-		        computers.table.getColumnModel().getColumn(4).setHeaderValue("CPU");
-		        computers.table.getColumnModel().getColumn(5).setHeaderValue("GPU");
-		        computers.table.getColumnModel().getColumn(6).setHeaderValue("RAM");
-		        computers.table.getColumnModel().getColumn(7).setHeaderValue("HDD");
-		        computers.table.getColumnModel().getColumn(8).setHeaderValue("COOLING");
-		        computers.hideIdColumn();
-		        computers.clearForm();
 			} catch (SQLException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -297,9 +305,7 @@ public class PcBuilder extends JFrame{
 				state.setInt(1, id);
 				state.execute();
 				id = -1;
-				employees.table.setModel(DBHelper.getEmpModel());
-				employees.table.getColumnModel().getColumn(3).setHeaderValue("COMPUTER");
-				employees.hideIdColumn();
+				employees.updateTable();
 				employees.clearForm();
 			} catch (SQLException e1) {
 				// TODO Auto-generated catch block
@@ -334,24 +340,8 @@ public class PcBuilder extends JFrame{
 				state.setString(3, type);
 				state.execute();
 				id = -1;
-				parts.table.setModel(DBHelper.getAllModel("parts"));
-				parts.hideIdColumn();
-				switch(type) {
-					case "CPU":
-						computers.cpuCombo.addItem(name);
-						break;
-					case "GPU":
-						computers.gpuCombo.addItem(name);
-						break;
-					case "RAM":
-						computers.ramCombo.addItem(name);
-						break;
-					case "HDD":
-						computers.hddCombo.addItem(name);
-						break;
-					case "Cooling":
-						computers.coolingCombo.addItem(name);
-				}
+				parts.updateTable();
+				computers.updateCombos();
 			} catch (SQLException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -396,13 +386,9 @@ public class PcBuilder extends JFrame{
 				state.setInt(7, hddId);
 				state.setInt(8, coolingId);
 				state.execute();
-				computers.table.setModel(DBHelper.getCompModel());
-		        computers.table.getColumnModel().getColumn(4).setHeaderValue("CPU");
-		        computers.table.getColumnModel().getColumn(5).setHeaderValue("GPU");
-		        computers.table.getColumnModel().getColumn(6).setHeaderValue("RAM");
-		        computers.table.getColumnModel().getColumn(7).setHeaderValue("HDD");
-		        computers.table.getColumnModel().getColumn(8).setHeaderValue("COOLING");
-		        computers.hideIdColumn();
+				computers.updateTable();
+				employees.updateCombos();
+
 				} catch (SQLException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -439,8 +425,7 @@ public class PcBuilder extends JFrame{
 				state.setInt(2, comp);
 				state.execute();
 				id = -1;
-				employees.table.setModel(DBHelper.getEmpModel());
-				employees.hideIdColumn();
+				employees.updateTable();
 			} catch (SQLException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -477,24 +462,9 @@ public class PcBuilder extends JFrame{
 				state.setInt(4, id);
 				state.execute();
 				id = -1;
-				parts.table.setModel(DBHelper.getAllModel("parts"));
-				parts.hideIdColumn();
-				switch(type) {
-					case "CPU":
-						computers.cpuCombo.addItem(name);
-						break;
-					case "GPU":
-						computers.gpuCombo.addItem(name);
-						break;
-					case "RAM":
-						computers.ramCombo.addItem(name);
-						break;
-					case "HDD":
-						computers.hddCombo.addItem(name);
-						break;
-					case "Cooling":
-						computers.coolingCombo.addItem(name);
-				}
+				parts.updateTable();
+				computers.updateCombos();
+				computers.updateTable();
 			} catch (SQLException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
@@ -538,13 +508,9 @@ public class PcBuilder extends JFrame{
 				state.setInt(8, coolingId);
 				state.setInt(9, id);
 				state.execute();
-				computers.table.setModel(DBHelper.getCompModel());
-				computers.table.getColumnModel().getColumn(4).setHeaderValue("CPU");
-				computers.table.getColumnModel().getColumn(5).setHeaderValue("GPU");
-				computers.table.getColumnModel().getColumn(6).setHeaderValue("RAM");
-				computers.table.getColumnModel().getColumn(7).setHeaderValue("HDD");
-				computers.table.getColumnModel().getColumn(8).setHeaderValue("COOLING");
-				computers.hideIdColumn();
+				computers.updateTable();
+				employees.updateCombos();
+				employees.updateTable();
 				id = -1;
 			} catch (SQLException e1) {
 				// TODO Auto-generated catch block
@@ -582,8 +548,7 @@ public class PcBuilder extends JFrame{
 				state.setInt(4, id);
 				state.execute();
 				id = -1;
-				employees.table.setModel(DBHelper.getEmpModel());
-				employees.hideIdColumn();
+				employees.updateTable();
 			} catch (SQLException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();

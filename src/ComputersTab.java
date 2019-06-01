@@ -7,6 +7,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.awt.*;
+import java.util.HashMap;
+import java.util.Map.Entry;
 
 public class ComputersTab extends Tab {
     JLabel nameLabel = new JLabel("Name:");
@@ -22,18 +24,14 @@ public class ComputersTab extends Tab {
     JTextField priceTField = new JTextField();
     String[] typeContent = {"","Gaming PC","2 in 1","Super computer"};
     JComboBox<String> typeCombo = new JComboBox<>(typeContent);
-    JComboBox<String> cpuCombo;
-    JComboBox<String> gpuCombo;
-    JComboBox<String> ramCombo;
-    JComboBox<String> hddCombo;
-    JComboBox<String> coolingCombo;
+    JComboBox<String> cpuCombo = new JComboBox<>();
+    JComboBox<String> gpuCombo = new JComboBox<>();
+    JComboBox<String> ramCombo = new JComboBox<>();
+    JComboBox<String> hddCombo = new JComboBox<>();
+    JComboBox<String> coolingCombo = new JComboBox<>();
 
     public ComputersTab() {
-        cpuCombo = new JComboBox<>(getParts("CPU").toArray(new String[0]));
-        gpuCombo = new JComboBox<>(getParts("GPU").toArray(new String[0]));
-        ramCombo = new JComboBox<>(getParts("RAM").toArray(new String[0]));
-        hddCombo = new JComboBox<>(getParts("HDD").toArray(new String[0]));
-        coolingCombo = new JComboBox<>(getParts("Cooling").toArray(new String[0]));
+        updateCombos();
 
         priceTField.setEditable(false);
         upPanel.setLayout(new GridLayout(8, 2));
@@ -53,46 +51,18 @@ public class ComputersTab extends Tab {
         upPanel.add(typeCombo);
         upPanel.add(priceLabel);
         upPanel.add(priceTField);
-        table.setModel(DBHelper.getCompModel());
-        table.getColumnModel().getColumn(4).setHeaderValue("CPU");
-        table.getColumnModel().getColumn(5).setHeaderValue("GPU");
-        table.getColumnModel().getColumn(6).setHeaderValue("RAM");
-        table.getColumnModel().getColumn(7).setHeaderValue("HDD");
-        table.getColumnModel().getColumn(8).setHeaderValue("COOLING");
-        this.hideIdColumn();
+        updateTable();
         scroller.setPreferredSize(new Dimension(850, 100));
     }
 
-    public int getCompId(String name) {
-    	int id = -1;
-        String sql = "select id from computers where name=?";
-        PreparedStatement state = null;
-        Connection conn = DBHelper.getConnection();
-        try {
-            state = conn.prepareStatement(sql);
-            state.setString(1, name);
-            ResultSet result = state.executeQuery();
-
-            while (result.next()) {
-                id = result.getInt("id");
-            }
-
-        } catch (SQLException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }finally {
-            try {
-                state.close();
-                conn.close();
-            } catch (SQLException e1) {
-                // TODO Auto-generated catch block
-                e1.printStackTrace();
-            }
-        }
-        return id;
+    private HashMap<String, JComboBox> getCombos() {
+        HashMap<String, JComboBox> combos = new HashMap<>();
+        combos.put("CPU", cpuCombo);
+        combos.put("GPU", gpuCombo);
+        combos.put("RAM", ramCombo);
+        combos.put("HDD", hddCombo);
+        combos.put("Cooling", coolingCombo);
+        return combos;
     }
     
     private ArrayList<String> getParts(String part) {
@@ -128,6 +98,88 @@ public class ComputersTab extends Tab {
             }
         }
         return parts;
+    }
+
+    public int getCompId(String name) {
+        int id = -1;
+        String sql = "select id from computers where name=?";
+        PreparedStatement state = null;
+        Connection conn = DBHelper.getConnection();
+        try {
+            state = conn.prepareStatement(sql);
+            state.setString(1, name);
+            ResultSet result = state.executeQuery();
+
+            while (result.next()) {
+                id = result.getInt("id");
+            }
+
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }finally {
+            try {
+                state.close();
+                conn.close();
+            } catch (SQLException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
+        }
+        return id;
+    }
+
+    public String getCompName(int id) {
+        String sql = "select name from computers where id=" + id;
+        String name = "";
+        PreparedStatement state = null;
+        Connection conn = DBHelper.getConnection();
+        try {
+            state = conn.prepareStatement(sql);
+            ResultSet result = state.executeQuery();
+
+            if (result.next()) {
+                name = result.getString("name");
+            }
+
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }finally {
+            try {
+                state.close();
+                conn.close();
+            } catch (SQLException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
+        }
+        return name;
+    }
+
+    public void updateCombos() {
+        for (Entry<String, JComboBox> e : getCombos().entrySet()) {
+            e.getValue().removeAllItems();
+            for (String item : getParts(e.getKey())) {
+                e.getValue().addItem(item);
+            }
+        }
+    }
+
+    public void updateTable() {
+        table.setModel(DBHelper.getCompModel());
+        table.getColumnModel().getColumn(4).setHeaderValue("CPU");
+        table.getColumnModel().getColumn(5).setHeaderValue("GPU");
+        table.getColumnModel().getColumn(6).setHeaderValue("RAM");
+        table.getColumnModel().getColumn(7).setHeaderValue("HDD");
+        table.getColumnModel().getColumn(8).setHeaderValue("COOLING");
+        hideIdColumn();
     }
 
     public double getTotalPrice(int... partIds) {

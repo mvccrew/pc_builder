@@ -32,7 +32,7 @@ public abstract class Tab {
         midPanel.add(addBtn);
         midPanel.add(updateBtn);
         midPanel.add(delBtn);
-        searchPanel.setLayout(new GridLayout(2, 2));
+        searchPanel.setLayout(new GridLayout(4, 2));
         searchPanel.add(searchLabel);
         searchPanel.add(searchTField);
         searchPanel.add(searchBtn);
@@ -50,5 +50,8 @@ public abstract class Tab {
     public ArrayList<JPanel> getPanels() {
         return new ArrayList<>(Arrays.asList(upPanel, midPanel, searchPanel,downPanel));
     }
+
+    abstract void updateCombos();
+    abstract void updateTable();
     abstract void clearForm();
 }

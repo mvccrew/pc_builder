@@ -84,26 +84,49 @@ public class DBHelper {
 
 		return model;
 	}//end method
+	
+	public static MyModel getByDepAndSearchModel(String dep, double price) {
+		String sql = "SELECT E.NAME\n" + 
+				"FROM EMPLOYEES E JOIN COMPUTERS C\n" + 
+				"ON E.COMPUTER_ID = C.ID\n" + 
+				"WHERE E.DEPARTMENT = '"+ dep + "' AND C.PRICE > " + price + ";";
+		conn = getConnection();
+		try {
+			PreparedStatement state = conn.prepareStatement(sql);
+			result = state.executeQuery();
+			model = new MyModel(result);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return model;
+	}//end method
 
 	public static MyModel getFilteredByName(String name, String tableName) {
+		String tempSQL = "%" + name + "%";
 		String sql = "";
 		switch (tableName){
 			case "parts":
-				sql = name.equalsIgnoreCase("") ? "select * from " + tableName : "select * from " + tableName + " where name = ?;";
+				sql = "SELECT NAME, PRICE, TYPE FROM PARTS\n" +
+						"WHERE NAME LIKE ?;";
 				break;
 			case "computers":
-				sql = "SELECT C.ID, C.NAME, C.PRICE, C.TYPE, P.NAME, P1.NAME, P2.NAME, P3.NAME, P4.NAME\n" +
+				sql = "SELECT C.NAME, C.PRICE, C.TYPE, P.NAME, P1.NAME, P2.NAME, P3.NAME, P4.NAME\n" +
 						"FROM COMPUTERS C JOIN PARTS P\n" +
 						"ON C.CPUID = P.ID JOIN PARTS P1 ON C.GPUID = P1.ID\n" +
 						"JOIN PARTS P2 ON C.RAMID = P2.ID JOIN PARTS P3 ON C.HDDID = P3.ID\n" +
 						"JOIN PARTS P4 ON C.COOLINGID = P4.ID\n" +
-						"WHERE C.NAME = ?;";
+						"WHERE C.NAME LIKE ?;";
 				break;
 			case "employees":
-				sql = "SELECT E.ID, E.NAME, E.DEPARTMENT, C.NAME\n" +
+				sql = "SELECT E.NAME, E.DEPARTMENT, C.NAME\n" +
 						"FROM EMPLOYEES E JOIN COMPUTERS C\n" +
 						"ON E.COMPUTER_ID = C.ID\n" +
-						"WHERE E.NAME regexp '^[?]';";
+						"WHERE E.NAME LIKE ?;";
 				break;
 
 		}
@@ -111,7 +134,7 @@ public class DBHelper {
 		try {
 			PreparedStatement state = conn.prepareStatement(sql);
 			if (!name.equalsIgnoreCase("")) {
-				state.setString(1, name);
+				state.setString(1, tempSQL);
 			}
 			result = state.executeQuery();
 			model = new MyModel(result);

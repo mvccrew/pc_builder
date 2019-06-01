@@ -23,8 +23,7 @@ public class PartsTab extends Tab {
         upPanel.add(priceTField);
         upPanel.add(typeLabel);
         upPanel.add(typeCombo);
-        table.setModel(DBHelper.getAllModel("parts"));
-        this.hideIdColumn();
+        updateTable();
     }
 
     public int getPartId(String name, String type) {
@@ -58,6 +57,13 @@ public class PartsTab extends Tab {
             }
         }
         return id;
+    }
+
+    public void updateCombos() {} // Няма нужда от тоя
+
+    public void updateTable() {
+        table.setModel(DBHelper.getAllModel("parts"));
+        hideIdColumn();
     }
 
     public void clearForm() {
